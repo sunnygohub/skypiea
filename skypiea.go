@@ -1,6 +1,6 @@
 package skypiea
 
-// const version = "1.0.0"
+const version = "1.0.0"
 
 func (s *Skypiea) New(rootPath string) error {
 	pathConfig := initPaths{

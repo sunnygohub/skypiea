@@ -1,4 +1,4 @@
-name: Update Git Tag
+name: Update Git Tag from Go Version
 
 on:
   push:
@@ -18,15 +18,23 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-      - name: Get latest tag
-        id: get_tag
+      - name: Extract version from skypiea.go
+        id: get_version
         run: |
-          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0")
-          echo "Última tag encontrada: $latest_tag"
-          new_tag=$(echo $latest_tag | awk -F. '{print $1"."$2"."$3+1}')
-          echo "new_tag=$new_tag" >> $GITHUB_ENV
+          version=$(grep -oP 'const version = "\K[^"]+' skypiea/skypiea.go)
+          echo "VERSION=$version" >> $GITHUB_ENV
+          echo "Versão extraída: $version"
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if git rev-parse "refs/tags/${{ env.VERSION }}" >/dev/null 2>&1; then
+            echo "Tag ${{ env.VERSION }} já existe. Nenhuma ação necessária."
+            exit 0
+          fi
 
       - name: Create new tag
         run: |
-          git tag ${{ env.new_tag }}
-          git push origin ${{ env.new_tag }}
+          git tag ${{ env.VERSION }}
+          git push origin ${{ env.VERSION }}
+          echo "Nova tag criada: ${{ env.VERSION }}"

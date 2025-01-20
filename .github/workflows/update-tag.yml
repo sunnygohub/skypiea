@@ -1,0 +1,32 @@
+name: Update Git Tag
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Git user
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0")
+          echo "Última tag encontrada: $latest_tag"
+          new_tag=$(echo $latest_tag | awk -F. '{print $1"."$2"."$3+1}')
+          echo "new_tag=$new_tag" >> $GITHUB_ENV
+
+      - name: Create new tag
+        run: |
+          git tag ${{ env.new_tag }}
+          git push origin ${{ env.new_tag }}

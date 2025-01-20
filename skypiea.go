@@ -1,8 +1,13 @@
 package skypiea
 
-import "github.com/joho/godotenv"
+import (
+	"os"
+	"strconv"
 
-// const version = "1.0.0"
+	"github.com/joho/godotenv"
+)
+
+const version = "1.0.0"
 
 func (s *Skypiea) New(rootPath string) error {
 	pathConfig := initPaths{
@@ -24,6 +29,12 @@ func (s *Skypiea) New(rootPath string) error {
 	if err != nil {
 		return err
 	}
+
+	infoLog, errorLog := s.startLoggers()
+	s.InfoLog = infoLog
+	s.ErrorLog = errorLog
+	s.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
+	s.Version = version
 
 	return nil
 }

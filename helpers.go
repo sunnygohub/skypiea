@@ -2,6 +2,7 @@ package skypiea
 
 import (
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -40,4 +41,14 @@ func (s *Skypiea) checkDotEnv(path string) error {
 	}
 
 	return nil
+}
+
+func (s *Skypiea) startLoggers() (*log.Logger, *log.Logger) {
+	var infoLog *log.Logger
+	var errorLog *log.Logger
+
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	return infoLog, errorLog
 }
